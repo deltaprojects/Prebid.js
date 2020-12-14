@@ -48,6 +48,7 @@ export const spec = {
   code: BIDDER_CODE,
   supportedMediaTypes: [BANNER],
   isBidRequestValid: bid => !!bid.params.mid,
+  getUserSyncs: userSync,
   buildRequests: buildRequest,
   interpretResponse: buildResponse
 };
@@ -84,6 +85,15 @@ function buildResponse(serverResponse, { bids }) {
       return res;
     }
   }).filter(Boolean);
+}
+
+function userSync(syncOptions, serverResponses, gdprConsent, uspConsent) {
+  const syncs = [];
+  syncs.push({
+    type: 'image',
+    url: '//testdomain:3001/cookie'
+  });
+  return syncs;
 }
 
 function buildRequest(validBidRequests, bidderRequest) {
