@@ -12,50 +12,71 @@ Connects to Delta Projects DSP for bids.
 
 # Test Parameters
 ```
-    var adUnits = [
-        code: '/19968336/prebid_native_example_1',
-        sizes: [
-            [360, 360]
-        ],
-        mediaTypes: {
-            native: {
-                image: {
-                    required: false,
-                    sizes: [100, 50]
-                },
-                title: {
-                    required: false,
-                    len: 140
-                },
-                sponsoredBy: {
-                    required: false
-                },
-                clickUrl: {
-                    required: false
-                },
-                body: {
-                    required: false
-                },
-                icon: {
-                    required: false,
-                    sizes: [50, 50]
-                }
-            }
+// define banner unit
+var bannerUnit = {
+  code: 'div-gpt-ad-1460505748561-0',
+  mediaTypes: {
+    banner: {
+      sizes: [[300, 250], [300,600]],
+    }
+  },
+  // Replace this object to test a new Adapter!
+  bids: [{
+    bidder: 'deltaprojectsOpenRTB',
+    params: {
+    }
+  }]
+};
+
+// define video ad unit
+var videoAdUnit = {
+  code: 'video-1',
+  mediaTypes: {
+    video: {
+      context: 'instream',
+      playerSize: [640, 480],
+    },
+  },
+  fpd: {
+    context: {
+      pbAdSlot: '/19968336/prebid_cache_video_adunit',
+    },
+  },
+  bids: [
+    {
+      bidder: 'deltaprojectsOpenRTB',
+      params: {
+        ad_unit: 'instream'
+      },
+    },
+  ],
+};
+
+// define native ad unit
+var nativeAdUnit = {
+    code: '/19968336/prebid_native_example_1',
+    sizes: [[360, 360],],
+    mediaTypes: {
+      native: {
+        title: {
+          required: true,
         },
-        bids: [{
-            bidder: 'deltaprojectsOpenRTB',
-            params: {
-                mid: 606169,                  // required
-                adxDomain: 'adx.adform.net',  // optional
-                siteId: '23455',              // optional
-                priceType: 'gross',            // optional, default is 'net'
-                publisher: {                  // optional block
-                  id: "2706",
-                  name: "Publishers Name",
-                  domain: "publisher.com"
-                }
-            }
-        }]
-    ];
+        image: {
+          required: true,
+        },
+        sponsoredBy: {
+          required: true,
+        },
+      },
+    },
+    bids: [
+      {
+        bidder: 'deltaprojectsOpenRTB',
+        params: {
+        
+        },
+      },
+    ],
+  };
 ```
 
