@@ -24,59 +24,17 @@ var bannerUnit = {
   bids: [{
     bidder: 'deltaprojectsOpenRTB',
     params: {
+      publisher: {
+        id: '4',                // requirerd
+      },
+      user: {
+        id: 'd0a3d74d475e1a62', // required
+      },
+      device: {
+        ip: '78.31.206.104',    // required
+      },
     }
   }]
 };
-
-// define video ad unit
-var videoAdUnit = {
-  code: 'video-1',
-  mediaTypes: {
-    video: {
-      context: 'instream',
-      playerSize: [640, 480],
-    },
-  },
-  fpd: {
-    context: {
-      pbAdSlot: '/19968336/prebid_cache_video_adunit',
-    },
-  },
-  bids: [
-    {
-      bidder: 'deltaprojectsOpenRTB',
-      params: {
-        ad_unit: 'instream'
-      },
-    },
-  ],
-};
-
-// define native ad unit
-var nativeAdUnit = {
-    code: '/19968336/prebid_native_example_1',
-    sizes: [[360, 360],],
-    mediaTypes: {
-      native: {
-        title: {
-          required: true,
-        },
-        image: {
-          required: true,
-        },
-        sponsoredBy: {
-          required: true,
-        },
-      },
-    },
-    bids: [
-      {
-        bidder: 'deltaprojectsOpenRTB',
-        params: {
-        
-        },
-      },
-    ],
-  };
 ```
 

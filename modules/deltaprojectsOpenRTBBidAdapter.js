@@ -19,6 +19,21 @@ function isBidRequestValid(bid) {
 
   if (bid.bidder !== BIDDER_CODE) return false;
 
+  // publisher id is required
+  const publisherId = utils.deepAccess(bid, 'params.publisher.id')
+  utils.logError('Invalid bid request, missing publisher id in params');
+  if (!publisherId) return false;
+
+  // user id is required
+  const userId = utils.deepAccess(bid, 'params.user.id')
+  utils.logError('Invalid bid request, missing user id in params');
+  if (!userId) return false;
+
+  // ip address is required
+  const ipAddr = utils.deepAccess(bid, 'params.device.ip')
+  utils.logError('Invalid bid request, missing user id in params');
+  if (!ipAddr) return false;
+
   return true;
 }
 
@@ -32,6 +47,8 @@ function buildRequests(validBidRequests, bidderRequest) {
   const loc = utils.parseUrl(bidderRequest.refererInfo.referer);
   const publisher = setOnAny(validBidRequests, 'params.publisher');
   const siteId = setOnAny(validBidRequests, 'params.siteId');
+  const userInfo = setOnAny(validBidRequests, 'params.user')
+  const deviceInfo = setOnAny(validBidRequests, 'params.device')
   const site = {
     id: siteId,
     domain: loc.hostname,
@@ -46,10 +63,11 @@ function buildRequests(validBidRequests, bidderRequest) {
     ua,
     w: screen.width,
     h: screen.height,
+    ...deviceInfo
   }
 
   // -- build user, reg
-  let user = { ext: {} };
+  let user = { ext: {}, ...userInfo };
   const regs = { ext: {} };
   const gdprConsent = bidderRequest && bidderRequest.gdprConsent;
   if (gdprConsent) {
@@ -296,7 +314,11 @@ function interpretResponse(serverResponse, { data: rtbRequest }) {
         }
       } else {
         bidObj.mediaType = BANNER;
-        bidObj.ad = bid.adm;
+        let adm = bid.adm;
+        if (adm.includes('${AUCTION_PRICE:B64}')) {
+          adm = adm.replaceAll('${AUCTION_PRICE:B64}', bid.price)
+        }
+        bidObj.ad = adm;
         if (bid.nurl) {
           bidObj.ad += utils.createTrackPixelHtml(decodeURIComponent(bid.nurl));
         }

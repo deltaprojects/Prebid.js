@@ -37,73 +37,27 @@
           bids: [{
             bidder: 'deltaprojectsOpenRTB',
             params: {
+              publisher: {
+                id: '4',
+              },
+              user: {
+                id: 'd0a3d74d475e1a6241e3130ff89287e9789ad513',
+              },
+              device: {
+                ip: '78.31.206.104',
+              },
             }
           }]
         };
-        
-        // define video ad unit
-        var videoAdUnit = {
-          code: 'video-1',
-          mediaTypes: {
-            video: {
-              context: 'instream',
-              playerSize: [640, 480],
-            },
-          },
-          fpd: {
-            context: {
-              pbAdSlot: '/19968336/prebid_cache_video_adunit',
-            },
-          },
-          bids: [
-            {
-              bidder: 'deltaprojectsOpenRTB',
-              params: {
-                ad_unit: 'instream'
-              },
-            },
-          ],
-        };
-        
-        // define native ad unit
-        var nativeAdUnit = {
-            code: '/19968336/prebid_native_example_1',
-            sizes: [[360, 360],],
-            mediaTypes: {
-              native: {
-                title: {
-                  required: true,
-                },
-                image: {
-                  required: true,
-                },
-                sponsoredBy: {
-                  required: true,
-                },
-              },
-            },
-            bids: [
-              {
-                bidder: 'deltaprojectsOpenRTB',
-                params: {
-                
-                },
-              },
-            ],
-          };
 
         // define ad slot in google tag
         googletag.cmd.push(function () {
-          googletag.defineSlot('/19968336/header-bid-tag-0', [[300, 250], [300, 600]], 'div-gpt-ad-1460505748561-0').addService(googletag.pubads());
+          googletag.defineSlot('/19968336/header-bid-tag-0', [[300, 250], [300, 600]], 'div-gpt-ad-1460505748561-0')
+            .addService(googletag.pubads());
           googletag.enableServices();
         });
 
         /** -- helper methods -- **/
-        var shouldInvokeVideoPlayer = false;
-        var invokeVideoPlayer = function (url) {
-          shouldInvokeVideoPlayer = url;
-        };
-
         function onReceiveBidsFromBidder(bids) {
           if (pbjs.adserverRequestSent) return;
           pbjs.adserverRequestSent = true;
@@ -115,27 +69,6 @@
               googletag.pubads().refresh();
             });
           });
-  
-          // for video unit
-          var videoBid = bids[videoAdUnit.code];
-          if (videoBid) {
-            var videoUrl = videoBid.bids[0].vastUrl;
-            invokeVideoPlayer(videoUrl);
-          }
-          
-          // for native unit
-          var nativeBid = bids[nativeAdUnit.code]
-          if(nativeBid){
-            var native = nativeBid.bids[0].native;
-            var nativeSlot = document.getElementById('native-1');
-            nativeSlot.style.background = `url(${native.image.url})`;
-            nativeSlot.style.backgroundSize = 'cover';
-            nativeSlot.style.width = '500px';
-            nativeSlot.style.height = '300px';
-            nativeSlot.style.display = 'flex';
-            nativeSlot.style.justifyContent = 'center';
-            nativeSlot.innerHTML = `<a href="${native.clickUrl}" style="color: white; align-self: center" target="_blank"><b>${nativeBid.bids[0].native.title}</b></a>`
-          }
         }
         
         /** -- register ad units & schedule bids -- **/
@@ -146,15 +79,6 @@
           
           // add banner unit
           pbjs.addAdUnits(bannerUnit);
-
-          // // add video unit
-          // pbjs.setConfig({
-          //   cache: { url: 'https://prebid.adnxs.com/pbc/v1/cache' }, // or whatever your preferred video cache URL is
-          // });
-          // pbjs.addAdUnits(videoAdUnit);
-          //
-          // // add native unit
-          // pbjs.addAdUnits(nativeAdUnit);
           
           // send requests
           pbjs.requestBids({
@@ -180,34 +104,5 @@
       </script>
     </div>
     <br>
-  
-<!--    <h4>Video-1</h4>-->
-<!--    <div id="video-1"></div>-->
-<!--    <script src="https://content.jwplatform.com/libraries/72xIKEe6.js" type='text/javascript'></script>-->
-<!--    <script>-->
-<!--      var playerInstance = jwplayer('video-1');-->
-<!--      invokeVideoPlayer = function (url) {-->
-<!--        playerInstance.setup({-->
-<!--          'playlist': 'https://content.jwplatform.com/feeds/ae4tmw2D.json',-->
-<!--          'width': 480,-->
-<!--          'height': 320,-->
-<!--          'advertising': {-->
-<!--            'client': 'vast',-->
-<!--            'tag': url,-->
-<!--          },-->
-<!--        });-->
-<!--      };-->
-<!--      if (shouldInvokeVideoPlayer) {-->
-<!--        invokeVideoPlayer(shouldInvokeVideoPlayer);-->
-<!--        shouldInvokeVideoPlayer = false;-->
-<!--      }-->
-<!--    </script>-->
-  
-<!--    <br>-->
-<!--    <h4>Native-1</h4>-->
-<!--    <div id='native-1'>-->
-<!--    -->
-<!--    </div>-->
-    
   </body>
   </html>

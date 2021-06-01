@@ -12,8 +12,15 @@ describe('deltaprojectsOpenRTBBidAdapter', function() {
       return {
         'bidder': BIDDER_CODE,
         'params': {
-          'tagId': '403370',
-          'siteId': 'example.com',
+          publisher: {
+            id: '4', // requirerd
+          },
+          user: {
+            id: 'd0a3d74d475e1a62', // required
+          },
+          device: {
+            ip: '78.31.206.104', // required
+          },
         },
         'adUnitCode': 'adunit-code',
         'sizes': [
