@@ -147,14 +147,14 @@
           // add banner unit
           pbjs.addAdUnits(bannerUnit);
 
-          // add video unit
-          pbjs.setConfig({
-            cache: { url: 'https://prebid.adnxs.com/pbc/v1/cache' }, // or whatever your preferred video cache URL is
-          });
-          pbjs.addAdUnits(videoAdUnit);
-          
-          // add native unit
-          pbjs.addAdUnits(nativeAdUnit);
+          // // add video unit
+          // pbjs.setConfig({
+          //   cache: { url: 'https://prebid.adnxs.com/pbc/v1/cache' }, // or whatever your preferred video cache URL is
+          // });
+          // pbjs.addAdUnits(videoAdUnit);
+          //
+          // // add native unit
+          // pbjs.addAdUnits(nativeAdUnit);
           
           // send requests
           pbjs.requestBids({
@@ -181,33 +181,33 @@
     </div>
     <br>
   
-    <h4>Video-1</h4>
-    <div id="video-1"></div>
-    <script src="https://content.jwplatform.com/libraries/72xIKEe6.js" type='text/javascript'></script>
-    <script>
-      var playerInstance = jwplayer('video-1');
-      invokeVideoPlayer = function (url) {
-        playerInstance.setup({
-          'playlist': 'https://content.jwplatform.com/feeds/ae4tmw2D.json',
-          'width': 480,
-          'height': 320,
-          'advertising': {
-            'client': 'vast',
-            'tag': url,
-          },
-        });
-      };
-      if (shouldInvokeVideoPlayer) {
-        invokeVideoPlayer(shouldInvokeVideoPlayer);
-        shouldInvokeVideoPlayer = false;
-      }
-    </script>
+<!--    <h4>Video-1</h4>-->
+<!--    <div id="video-1"></div>-->
+<!--    <script src="https://content.jwplatform.com/libraries/72xIKEe6.js" type='text/javascript'></script>-->
+<!--    <script>-->
+<!--      var playerInstance = jwplayer('video-1');-->
+<!--      invokeVideoPlayer = function (url) {-->
+<!--        playerInstance.setup({-->
+<!--          'playlist': 'https://content.jwplatform.com/feeds/ae4tmw2D.json',-->
+<!--          'width': 480,-->
+<!--          'height': 320,-->
+<!--          'advertising': {-->
+<!--            'client': 'vast',-->
+<!--            'tag': url,-->
+<!--          },-->
+<!--        });-->
+<!--      };-->
+<!--      if (shouldInvokeVideoPlayer) {-->
+<!--        invokeVideoPlayer(shouldInvokeVideoPlayer);-->
+<!--        shouldInvokeVideoPlayer = false;-->
+<!--      }-->
+<!--    </script>-->
   
-    <br>
-    <h4>Native-1</h4>
-    <div id='native-1'>
-    
-    </div>
+<!--    <br>-->
+<!--    <h4>Native-1</h4>-->
+<!--    <div id='native-1'>-->
+<!--    -->
+<!--    </div>-->
     
   </body>
   </html>
