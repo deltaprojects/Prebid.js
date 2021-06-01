@@ -9,6 +9,8 @@ import find from 'core-js-pure/features/array/find';
 export const BIDDER_CODE = 'deltaprojectsOpenRTB';
 export const SUPPORTED_NATIVE_VER = '1.2';
 export const BIDDER_ENDPOINT_URL = 'http://testdomain:3001/test';
+// export const BIDDER_ENDPOINT_URL = 'http://dogfight15.se-ix.delta.prod:1942/dogfight/prebid';
+// export const BIDDER_ENDPOINT_URL = 'http://dogfight-accept01.se-ix.delta.prod:1942/dogfight/prebid';
 export const USERSYNC_URL = 'http://testdomain:3001/cookie';
 
 /** -- isBidRequestValid --**/
@@ -350,6 +352,11 @@ function buildNativeImg(img) {
   }
 }
 
+/** -- On Bid Won -- **/
+function onBidWon(bid) {
+  console.log(`onBidWon is called for bid: [${bid.adId}, ${bid.mediaType}, ${bid.requestId}]`);
+}
+
 /** -- Get user syncs --**/
 function getUserSyncs(syncOptions, serverResponses, gdprConsent, uspConsent) {
   const syncs = [];
@@ -392,6 +399,7 @@ export const spec = {
   isBidRequestValid,
   buildRequests,
   interpretResponse,
+  onBidWon,
   getUserSyncs,
 };
 

@@ -115,7 +115,7 @@ function watch(done) {
     livereload: true
   });
 
-  mainWatcher.on('all', gulp.series(clean, gulp.parallel(lint, 'build-bundle-dev', test)));
+  mainWatcher.on('all', gulp.series(clean, gulp.parallel('build-bundle-dev')));
   loaderWatcher.on('all', gulp.series(lint));
   done();
 };
