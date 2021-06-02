@@ -19,18 +19,24 @@ function isBidRequestValid(bid) {
 
   // publisher id is required
   const publisherId = utils.deepAccess(bid, 'params.publisher.id')
-  utils.logError('Invalid bid request, missing publisher id in params');
-  if (!publisherId) return false;
+  if (!publisherId) {
+    utils.logError('Invalid bid request, missing publisher id in params');
+    return false;
+  }
 
   // user id is required
   const userId = utils.deepAccess(bid, 'params.user.id')
-  utils.logError('Invalid bid request, missing user id in params');
-  if (!userId) return false;
+  if (!userId) {
+    utils.logError('Invalid bid request, missing user id in params');
+    return false;
+  }
 
   // ip address is required
   const ipAddr = utils.deepAccess(bid, 'params.device.ip')
-  utils.logError('Invalid bid request, missing user id in params');
-  if (!ipAddr) return false;
+  if (!ipAddr) {
+    utils.logError('Invalid bid request, missing user id in params');
+    return false;
+  }
 
   return true;
 }
