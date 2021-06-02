@@ -31,7 +31,7 @@ var bannerUnit = {
         id: 'd0a3d74d475e1a62', // required
       },
       device: {
-        ip: '78.31.206.104',    // required
+        ip: '212.107.154.192',    // required
       },
     }
   }]
