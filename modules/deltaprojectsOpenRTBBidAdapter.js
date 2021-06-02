@@ -8,8 +8,8 @@ import find from 'core-js-pure/features/array/find';
 
 export const BIDDER_CODE = 'deltaprojectsOpenRTB';
 export const SUPPORTED_NATIVE_VER = '1.2';
-export const BIDDER_ENDPOINT_URL = 'http://dogfight15.se-ix.delta.prod:1942/dogfight/prebid';
-export const USERSYNC_URL = 'http://d5p.de17a.com/getuid/prebid';
+export const BIDDER_ENDPOINT_URL = 'http://d5p.de17a.com/dogfight/prebid';
+export const USERSYNC_URL = 'https://d5p.de17a.com/getuid/prebid';
 
 /** -- isBidRequestValid --**/
 function isBidRequestValid(bid) {
