@@ -272,13 +272,13 @@ function buildImpressionNative(nativeMediaType) {
 function interpretResponse(serverResponse, { data: rtbRequest }) {
   if (!serverResponse.body) {
     utils.logWarn('Response body is invalid, return !!');
-    return;
+    return [];
   }
 
   const { body: { id, seatbid, cur } } = serverResponse;
   if (!id || !seatbid) {
     utils.logWarn('Id / seatbid of response is invalid, return !!');
-    return;
+    return [];
   }
 
   const rtbReqImps = rtbRequest.imp;
