@@ -8,7 +8,7 @@ import find from 'core-js-pure/features/array/find';
 
 export const BIDDER_CODE = 'deltaprojectsOpenRTB';
 export const SUPPORTED_NATIVE_VER = '1.2';
-export const BIDDER_ENDPOINT_URL = 'http://dogfight-accept01.se-ix.delta.prod:1942/dogfight/prebid';
+export const BIDDER_ENDPOINT_URL = 'http://dogfight15.se-ix.delta.prod:1942/dogfight/prebid';
 export const USERSYNC_URL = 'http://d5p.de17a.com/getuid/prebid';
 
 /** -- isBidRequestValid --**/
@@ -370,8 +370,9 @@ function buildNativeImg(img) {
 
 /** -- On Bid Won -- **/
 function onBidWon(bid) {
-  console.debug(`onBidWon is called for bid: [${bid.adId}, ${bid.mediaType}, ${bid.requestId}]`);
+  // eslint-disable-next-line no-template-curly-in-string
   if (bid.ad.includes('${AUCTION_PRICE:B64}')) {
+    // eslint-disable-next-line no-template-curly-in-string
     bid.ad = bid.ad.replaceAll('${AUCTION_PRICE:B64}', Math.round(bid.cpm * 1000000))
   }
 }
