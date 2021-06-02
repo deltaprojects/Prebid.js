@@ -1,0 +1,108 @@
+<!--
+  This page calls a single bidder for a single ad slot. It can be considered a "hello world" example for using
+  Prebid with the Google Publisher Tag.
+  It also makes a good test page for new adapter PR submissions. Simply set your server's Bid Params object in the
+  bids array inside the adUnits, and it will use your adapter to load an ad.
+  NOTE that many ad servers won't send back an ad if the URL is localhost... so you might need to
+  set an alias in your /etc/hosts file so that you can load this page from a different domain.
+-->
+
+<html>
+  <head>
+      <script async src="../../build/dev/prebid.js"></script>
+      <script async src="https://www.googletagservices.com/tag/js/gpt.js"></script>
+      <script>
+        /** -- env -- **/
+        var pbjs = pbjs || {};
+        pbjs.que = pbjs.que || [];
+        var googletag = googletag || {};
+        googletag.cmd = googletag.cmd || [];
+        googletag.cmd.push(function() {
+          googletag.pubads().disableInitialLoad();
+        });
+        
+        /** -- config -- **/
+        var FAILSAFE_TIMEOUT = 3000;
+        var PREBID_TIMEOUT = 1000;
+  
+        // define google tag banner unit
+        var bannerUnit = {
+          code: 'div-gpt-ad-1460505748561-0',
+          mediaTypes: {
+            banner: {
+              sizes: [[300, 250], [300,600]],
+            }
+          },
+          // Replace this object to test a new Adapter!
+          bids: [{
+            bidder: 'deltaprojectsOpenRTB',
+            params: {
+              publisher: {
+                id: '4',
+              },
+              user: {
+                id: 'd0a3d74d475e1a6241e3130ff89287e9789ad513',
+              },
+              device: {
+                ip: '78.31.206.104',
+              },
+            }
+          }]
+        };
+
+        // define ad slot in google tag
+        googletag.cmd.push(function () {
+          googletag.defineSlot('/19968336/header-bid-tag-0', [[300, 250], [300, 600]], 'div-gpt-ad-1460505748561-0')
+            .addService(googletag.pubads());
+          googletag.enableServices();
+        });
+
+        /** -- helper methods -- **/
+        function onReceiveBidsFromBidder(bids) {
+          if (pbjs.adserverRequestSent) return;
+          pbjs.adserverRequestSent = true;
+          
+          // for gpt units
+          googletag.cmd.push(function() {
+            pbjs.que.push(function() {
+              pbjs.setTargetingForGPTAsync();
+              googletag.pubads().refresh();
+            });
+          });
+        }
+        
+        /** -- register ad units & schedule bids -- **/
+        pbjs.que.push(function() {
+          pbjs.setConfig({
+            debug: true,
+          });
+          
+          // add banner unit
+          pbjs.addAdUnits(bannerUnit);
+          
+          // send requests
+          pbjs.requestBids({
+            bidsBackHandler: onReceiveBidsFromBidder,
+            timeout: PREBID_TIMEOUT
+          });
+        });
+
+        setTimeout(function() {
+          onReceiveBidsFromBidder();
+        }, FAILSAFE_TIMEOUT);
+  
+      </script>
+  </head>
+  
+  <body>
+    <h2>Prebid.js Test</h2>
+  
+    <h4>Banner-1</h4>
+    <div id='div-gpt-ad-1460505748561-0'>
+      <script type='text/javascript'>
+        googletag.cmd.push(function () { googletag.display('div-gpt-ad-1460505748561-0'); })
+      </script>
+    </div>
+    <br>
+  </body>
+  </html>
