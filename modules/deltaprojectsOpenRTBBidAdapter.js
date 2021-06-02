@@ -415,7 +415,7 @@ function setOnAny(collection, key) {
 /** -- Register -- */
 export const spec = {
   code: BIDDER_CODE,
-  supportedMediaTypes: [BANNER, VIDEO, NATIVE],
+  supportedMediaTypes: [BANNER],
   isBidRequestValid,
   buildRequests,
   interpretResponse,
