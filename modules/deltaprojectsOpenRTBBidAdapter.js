@@ -385,11 +385,24 @@ function onBidWon(bid) {
 
 /** -- Get user syncs --**/
 function getUserSyncs(syncOptions, serverResponses, gdprConsent, uspConsent) {
-  const syncs = [];
-  syncs.push({
-    type: 'image',
-    url: USERSYNC_URL,
-  });
+  const syncs = []
+
+  if (syncOptions.pixelEnabled) {
+    let gdpr_params;
+    if (gdprConsent) {
+      if(typeof gdprConsent.gdprApplies === 'boolean') {
+        gdpr_params = `?gdpr=${Number(gdprConsent.gdprApplies)}&gdpr_consent=${gdprConsent.consentString}`;
+      } else {
+        gdpr_params = `?gdpr_consent=${gdprConsent.consentString}`;
+      }
+    } else {
+      gdpr_params = '';
+    }
+    syncs.push({
+      type: 'image',
+      url: USERSYNC_URL + gdpr_params
+    });
+  }
   return syncs;
 }
 
