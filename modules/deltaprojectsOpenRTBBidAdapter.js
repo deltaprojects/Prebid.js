@@ -137,24 +137,7 @@ function buildImpression(bid) {
   };
 
   const bannerMediaType = utils.deepAccess(bid, `mediaTypes.${BANNER}`);
-  const videoMediaType = utils.deepAccess(bid, `mediaTypes.${VIDEO}`);
-  const nativeMediaType = utils.deepAccess(bid, `mediaTypes.${NATIVE}`);
-  const isDefault = !(nativeMediaType || videoMediaType)
-
-  // banner / default
-  if (bannerMediaType || isDefault) {
-    impression.banner = buildImpressionBanner(bid, bannerMediaType);
-  }
-
-  // video
-  if (videoMediaType && videoMediaType.context === 'instream') {
-    impression.video = buildImpressionVideo(bid, videoMediaType);
-  }
-
-  // native
-  if (nativeMediaType) {
-    impression.native = buildImpressionNative(nativeMediaType);
-  }
+  impression.banner = buildImpressionBanner(bid, bannerMediaType);
 
   // bidfloor
   if (bid.params.floor) {
@@ -174,103 +157,6 @@ function buildImpressionBanner(bid, bannerMediaType) {
   const bannerSizes = (bannerMediaType && bannerMediaType.sizes) || bid.sizes;
   return {
     format: utils._map(bannerSizes, ([width, height]) => ({ w: width, h: height })),
-  };
-}
-
-function buildImpressionVideo(bid, videoMediaType) {
-  const video = { placement: 1 };
-
-  // mimes
-  video.mimes = videoMediaType.mimes || [];
-
-  // minduratiion
-  video.minduration = utils.deepAccess(bid, 'params.video.minduration');
-
-  // maxduration
-  video.maxduration = utils.deepAccess(bid, 'params.video.maxduration');
-
-  // protoccol
-  if (videoMediaType.protocols) video.protocols = videoMediaType.protocols;
-
-  // w, h
-  if (videoMediaType.playerSize && videoMediaType.playerSize.length) {
-    const size = videoMediaType.playerSize[0];
-    video.w = size[0];
-    video.h = size[1];
-  }
-
-  // startdelay
-  video.startdelay = utils.deepAccess(bid, 'params.video.startdelay');
-
-  // api
-  if (videoMediaType.api) video.api = videoMediaType.api;
-
-  // playbackend
-  if (videoMediaType.playbackmethod) video.playbackmethod = videoMediaType.playbackmethod;
-
-  return video;
-}
-
-function buildImpressionNative(nativeMediaType) {
-  const assets = [];
-
-  // title
-  const title = nativeMediaType.title;
-  if (title) {
-    assets.push(setAssetRequired(title, {
-      title: { len: title.len },
-    }));
-  }
-
-  // main
-  const img = nativeMediaType.image;
-  if (img) {
-    assets.push(setAssetRequired(img, {
-      img: {
-        type: 3, // Main
-        wmin: 1,
-        hmin: 1,
-      },
-    }));
-  }
-
-  // icon
-  const icon = nativeMediaType.icon;
-  if (icon) {
-    assets.push(setAssetRequired(icon, {
-      img: {
-        type: 1, // Icon
-        wmin: 1,
-        hmin: 1,
-      },
-    }));
-  }
-
-  // body
-  const body = nativeMediaType.body;
-  if (body) {
-    assets.push(setAssetRequired(body, { data: { type: 2 } }));
-  }
-
-  // cta
-  const cta = nativeMediaType.cta;
-  if (cta) {
-    assets.push(setAssetRequired(cta, { data: { type: 12 } }));
-  }
-
-  // sponsoredby
-  const sponsoredBy = nativeMediaType.sponsoredBy;
-  if (sponsoredBy) {
-    assets.push(setAssetRequired(sponsoredBy, { data: { type: 1 } }));
-  }
-
-  utils._each(assets, (asset, id) => asset.id = id);
-  return {
-    request: JSON.stringify({
-      ver: SUPPORTED_NATIVE_VER,
-      assets,
-    }),
-    ver: SUPPORTED_NATIVE_VER,
   };
 }
 
@@ -305,23 +191,15 @@ function interpretResponse(serverResponse, { data: rtbRequest }) {
         ttl: 60,
       };
 
-      if (rtbImp.video) {
-        bidObj.mediaType = VIDEO;
-        bidObj.vastXml = bid.adm;
-      } else if (rtbImp.native) {
-        const native = parseNativeResponse(bid.adm);
-        if (native) {
-          bidObj.mediaType = NATIVE;
-          bidObj.native = buildNativeResponse(native);
-        } else {
-          utils.logError('Invalid native in response', bid.adm);
-        }
-      } else {
-        bidObj.mediaType = BANNER;
-        bidObj.ad = bid.adm;
-        if (bid.nurl) {
-          bidObj.ad += utils.createTrackPixelHtml(decodeURIComponent(bid.nurl));
-        }
+      if (rtbImp.video || rtbImp.native) {
+        utils.logError('Did not support media type video and native');
+        return;
+      }
+
+      bidObj.mediaType = BANNER;
+      bidObj.ad = bid.adm;
+      if (bid.nurl) {
+        bidObj.ad += utils.createTrackPixelHtml(decodeURIComponent(bid.nurl));
       }
       if (bid.ext) {
         bidObj[BIDDER_CODE] = bid.ext;
@@ -330,48 +208,6 @@ function interpretResponse(serverResponse, { data: rtbRequest }) {
     });
   });
   return bidResponses;
-}
-
-function buildNativeResponse(response) {
-  const native = {};
-  if (response.link) {
-    native.clickUrl = response.link.url;
-  }
-  utils._each(response.assets, asset => {
-    switch (asset.id) {
-      case 1:
-        native.title = asset.title.text;
-        break;
-      case 2:
-        native.image = buildNativeImg(asset.img);
-        break;
-      case 3:
-        native.icon = buildNativeImg(asset.img);
-        break;
-      case 4:
-        native.body = asset.data.value;
-        break;
-      case 5:
-        native.cta = asset.data.value;
-        break;
-      case 6:
-        native.sponsoredBy = asset.data.value;
-        break;
-    }
-  });
-  return native;
-}
-
-function buildNativeImg(img) {
-  if (img.w || img.h) {
-    return {
-      url: img.url,
-      width: img.w,
-      height: img.h,
-    };
-  } else {
-    return img.url;
-  }
 }
 
 /** -- On Bid Won -- **/
@@ -407,21 +243,6 @@ function getUserSyncs(syncOptions, serverResponses, gdprConsent, uspConsent) {
 }
 
 /** -- Helper methods --**/
-function parseNativeResponse(adm) {
-  let native = null;
-  try {
-    native = JSON.parse(adm);
-  } catch (e) {
-    utils.logError('Sortable bid adapter unable to parse native bid response:\n\n' + e);
-  }
-  return native;
-}
-
-function setAssetRequired(native, asset) {
-  if (native.required) asset.required = 1;
-  return asset;
-}
-
 function setOnAny(collection, key) {
   for (let i = 0, result; i < collection.length; i++) {
     result = utils.deepAccess(collection[i], key);
