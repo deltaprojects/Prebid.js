@@ -25,13 +25,7 @@ var bannerUnit = {
     bidder: 'deltaprojectsOpenRTB',
     params: {
       publisher: {
-        id: '4',                // requirerd
-      },
-      user: {
-        id: 'd0a3d74d475e1a62', // required
-      },
-      device: {
-        ip: '212.107.154.192',    // required
+        id: '4'                // required
       },
     }
   }]

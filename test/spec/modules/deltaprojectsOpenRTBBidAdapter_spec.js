@@ -14,13 +14,7 @@ describe('deltaprojectsOpenRTBBidAdapter', function() {
         bidder: BIDDER_CODE,
         params: {
           publisher: {
-            id: '4', // requirerd
-          },
-          user: {
-            id: 'd0a3d74d475e1a62', // required
-          },
-          device: {
-            ip: '78.31.206.104', // required
+            id: '4' // required
           },
         },
         adUnitCode: 'adunit-code',

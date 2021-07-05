@@ -24,20 +24,6 @@ function isBidRequestValid(bid) {
     return false;
   }
 
-  // user id is required
-  const userId = utils.deepAccess(bid, 'params.user.id')
-  if (!userId) {
-    utils.logError('Invalid bid request, missing user id in params');
-    return false;
-  }
-
-  // ip address is required
-  const ipAddr = utils.deepAccess(bid, 'params.device.ip')
-  if (!ipAddr) {
-    utils.logError('Invalid bid request, missing user id in params');
-    return false;
-  }
-
   return true;
 }
 
@@ -51,8 +37,6 @@ function buildRequests(validBidRequests, bidderRequest) {
   const loc = utils.parseUrl(bidderRequest.refererInfo.referer);
   const publisher = setOnAny(validBidRequests, 'params.publisher');
   const siteId = setOnAny(validBidRequests, 'params.siteId');
-  const userInfo = setOnAny(validBidRequests, 'params.user')
-  const deviceInfo = setOnAny(validBidRequests, 'params.device')
   const site = {
     id: siteId,
     domain: loc.hostname,
@@ -66,12 +50,11 @@ function buildRequests(validBidRequests, bidderRequest) {
   const device = {
     ua,
     w: screen.width,
-    h: screen.height,
-    ...deviceInfo
+    h: screen.height
   }
 
   // -- build user, reg
-  let user = { ext: {}, ...userInfo };
+  let user = { ext: {} };
   const regs = { ext: {} };
   const gdprConsent = bidderRequest && bidderRequest.gdprConsent;
   if (gdprConsent) {
