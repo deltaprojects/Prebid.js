@@ -3,11 +3,11 @@ import {
   BIDDER_CODE,
   BIDDER_ENDPOINT_URL,
   spec,
-} from 'modules/deltaprojectsOpenRTBBidAdapter.js';
+} from 'modules/deltaprojectsBidAdapter.js';
 
 const BID_REQ_REFER = 'http://example.com/page?param=val'
 
-describe('deltaprojectsOpenRTBBidAdapter', function() {
+describe('deltaprojectsBidAdapter', function() {
   describe('isBidRequestValid', function () {
     function makeBid() {
       return {
@@ -164,7 +164,7 @@ describe('deltaprojectsOpenRTBBidAdapter', function() {
               bid: [
                 {
                   id: '6vmb3isptf',
-                  crid: 'deltaprojectsOpenRTBscreative',
+                  crid: 'deltaprojectscreative',
                   impid: '322add653672f68',
                   price: 1.22,
                   adm: '<!-- creative -->',
@@ -187,7 +187,7 @@ describe('deltaprojectsOpenRTBBidAdapter', function() {
       cpm: 1.22,
       width: 728,
       height: 90,
-      creativeId: 'deltaprojectsOpenRTBscreative',
+      creativeId: 'deltaprojectscreative',
       dealId: null,
       currency: 'USD',
       netRevenue: true,

@@ -1,7 +1,7 @@
 # Overview
 
 ```
-Module Name:  Delta Projects OpenRTB Bid Adapter
+Module Name:  Delta Projects Bid Adapter
 Module Type:  Bidder Adapter
 Maintainer:   dev@deltaprojects.com
 ```
@@ -22,7 +22,7 @@ var bannerUnit = {
   },
   // Replace this object to test a new Adapter!
   bids: [{
-    bidder: 'deltaprojectsOpenRTB',
+    bidder: 'deltaprojects',
     params: {
       publisher: {
         id: '4'                // required

@@ -6,7 +6,7 @@ import { BANNER, NATIVE, VIDEO } from '../src/mediaTypes.js';
 import * as utils from '../src/utils.js';
 import find from 'core-js-pure/features/array/find';
 
-export const BIDDER_CODE = 'deltaprojectsOpenRTB';
+export const BIDDER_CODE = 'deltaprojects';
 export const SUPPORTED_NATIVE_VER = '1.2';
 export const BIDDER_ENDPOINT_URL = 'https://d5p.de17a.com/dogfight/prebid';
 export const USERSYNC_URL = 'https://userservice.de17a.com/getuid/prebid';
