@@ -24,9 +24,7 @@ var bannerUnit = {
   bids: [{
     bidder: 'deltaprojects',
     params: {
-      publisher: {
-        id: '4'                // required
-      },
+      publisherId: '12345'   //required
     }
   }]
 };

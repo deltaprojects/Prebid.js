@@ -18,7 +18,7 @@ function isBidRequestValid(bid) {
   if (bid.bidder !== BIDDER_CODE) return false;
 
   // publisher id is required
-  const publisherId = utils.deepAccess(bid, 'params.publisher.id')
+  const publisherId = utils.deepAccess(bid, 'params.publisherId')
   if (!publisherId) {
     utils.logError('Invalid bid request, missing publisher id in params');
     return false;
@@ -35,14 +35,14 @@ function buildRequests(validBidRequests, bidderRequest) {
 
   // -- build site
   const loc = utils.parseUrl(bidderRequest.refererInfo.referer);
-  const publisher = setOnAny(validBidRequests, 'params.publisher');
+  const publisherId = setOnAny(validBidRequests, 'params.publisherId');
   const siteId = setOnAny(validBidRequests, 'params.siteId');
   const site = {
     id: siteId,
     domain: loc.hostname,
     page: loc.href,
     ref: loc.href,
-    publisher,
+    publisher: { id: publisherId },
   };
 
   // -- build device

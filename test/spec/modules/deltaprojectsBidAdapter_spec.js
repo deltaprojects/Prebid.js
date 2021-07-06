@@ -13,9 +13,7 @@ describe('deltaprojectsBidAdapter', function() {
       return {
         bidder: BIDDER_CODE,
         params: {
-          publisher: {
-            id: '4' // required
-          },
+          publisherId: '12345'
         },
         adUnitCode: 'adunit-code',
         sizes: [
