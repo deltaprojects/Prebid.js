@@ -2,12 +2,10 @@
 'use strict';
 
 import { registerBidder } from '../src/adapters/bidderFactory.js';
-import { BANNER, NATIVE, VIDEO } from '../src/mediaTypes.js';
+import { BANNER } from '../src/mediaTypes.js';
 import * as utils from '../src/utils.js';
-import find from 'core-js-pure/features/array/find';
 
 export const BIDDER_CODE = 'deltaprojects';
-export const SUPPORTED_NATIVE_VER = '1.2';
 export const BIDDER_ENDPOINT_URL = 'https://d5p.de17a.com/dogfight/prebid';
 export const USERSYNC_URL = 'https://userservice.de17a.com/getuid/prebid';
 
@@ -144,7 +142,7 @@ function buildImpressionBanner(bid, bannerMediaType) {
 }
 
 /** -- Interpret response --**/
-function interpretResponse(serverResponse, { data: rtbRequest }) {
+function interpretResponse(serverResponse) {
   if (!serverResponse.body) {
     utils.logWarn('Response body is invalid, return !!');
     return [];
@@ -156,12 +154,10 @@ function interpretResponse(serverResponse, { data: rtbRequest }) {
     return [];
   }
 
-  const rtbReqImps = rtbRequest.imp;
   const bidResponses = [];
 
   utils._each(seatbid, seatbid => {
     utils._each(seatbid.bid, bid => {
-      const rtbImp = rtbReqImps.length === 1 ? rtbReqImps[0] : find(rtbReqImps, imp => imp.id === bid.impid);
       const bidObj = {
         requestId: bid.impid,
         cpm: parseFloat(bid.price),
@@ -173,11 +169,6 @@ function interpretResponse(serverResponse, { data: rtbRequest }) {
         netRevenue: true,
         ttl: 60,
       };
-
-      if (rtbImp.video || rtbImp.native) {
-        utils.logError('Did not support media type video and native');
-        return;
-      }
 
       bidObj.mediaType = BANNER;
       bidObj.ad = bid.adm;
@@ -203,23 +194,23 @@ function onBidWon(bid) {
 }
 
 /** -- Get user syncs --**/
-function getUserSyncs(syncOptions, serverResponses, gdprConsent, uspConsent) {
+function getUserSyncs(syncOptions, serverResponses, gdprConsent) {
   const syncs = []
 
   if (syncOptions.pixelEnabled) {
-    let gdpr_params;
+    let gdprParams;
     if (gdprConsent) {
-      if(typeof gdprConsent.gdprApplies === 'boolean') {
-        gdpr_params = `?gdpr=${Number(gdprConsent.gdprApplies)}&gdpr_consent=${gdprConsent.consentString}`;
+      if (typeof gdprConsent.gdprApplies === 'boolean') {
+        gdprParams = `?gdpr=${Number(gdprConsent.gdprApplies)}&gdpr_consent=${gdprConsent.consentString}`;
       } else {
-        gdpr_params = `?gdpr_consent=${gdprConsent.consentString}`;
+        gdprParams = `?gdpr_consent=${gdprConsent.consentString}`;
       }
     } else {
-      gdpr_params = '';
+      gdprParams = '';
     }
     syncs.push({
       type: 'image',
-      url: USERSYNC_URL + gdpr_params
+      url: USERSYNC_URL + gdprParams
     });
   }
   return syncs;

@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import {
   BIDDER_CODE,
   BIDDER_ENDPOINT_URL,
-  spec,
+  spec, USERSYNC_URL,
 } from 'modules/deltaprojectsBidAdapter.js';
 
 const BID_REQ_REFER = 'http://example.com/page?param=val'
@@ -29,9 +29,19 @@ describe('deltaprojectsBidAdapter', function() {
       expect(spec.isBidRequestValid(makeBid())).to.equal(true);
     });
 
+    it('should return false when bid request is null', function () {
+      expect(spec.isBidRequestValid(undefined)).to.equal(false);
+    });
+
     it('should return false when bidder not set correctly', function () {
       let bid = makeBid();
       delete bid.bidder;
+      expect(spec.isBidRequestValid(bid)).to.equal(false);
+    });
+
+    it('should return false when publisher id is not set', function () {
+      let bid = makeBid();
+      delete bid.params.publisherId;
       expect(spec.isBidRequestValid(bid)).to.equal(false);
     });
   });
@@ -51,9 +61,36 @@ describe('deltaprojectsBidAdapter', function() {
       auctionId: '1d1a030790a475',
     }
     const bidRequests = [BIDREQ];
-
     const bannerRequest = spec.buildRequests(bidRequests, {refererInfo: { referer: BID_REQ_REFER }})[0];
     const bannerRequestBody = bannerRequest.data;
+
+    it('send bid request with test tag if it is set in the param', function () {
+      const TEST_TAG = 1;
+      const bidRequest = Object.assign({}, BIDREQ, {
+        params: { ...BIDREQ.params, test: TEST_TAG },
+      });
+      const bidderRequest = { refererInfo: { referer: BID_REQ_REFER }};
+      const request = spec.buildRequests([bidRequest], bidderRequest)[0];
+      expect(request.data.test).to.equal(TEST_TAG);
+    });
+
+    it('send bid request with imp extensions if it is set in the params', function () {
+      const bidderParams = { partner_abc: { setting1: 'abc', setting2: 'abc' } };
+      const bidRequest = Object.assign({}, BIDREQ, {
+        params: { ...BIDREQ.params, bidderParams },
+      });
+      const bidderRequest = { refererInfo: { referer: BID_REQ_REFER }};
+      const request = spec.buildRequests([bidRequest], bidderRequest)[0];
+      expect(request.data.imp[0].ext).to.deep.equal(bidderParams);
+    });
+
+    it('send bid request with correct timeout', function () {
+      const TMAX = 10;
+      const bidderRequest = { refererInfo: { referer: BID_REQ_REFER }, timeout: TMAX };
+      const request = spec.buildRequests(bidRequests, bidderRequest)[0];
+      expect(request.data.tmax).to.equal(TMAX);
+    });
+
     it('send bid request to the correct endpoint URL', function () {
       expect(bannerRequest.url).to.equal(BIDDER_ENDPOINT_URL);
     });
@@ -194,6 +231,25 @@ describe('deltaprojectsBidAdapter', function() {
       ad: '<!-- creative --><div style="position:absolute;left:0px;top:0px;visibility:hidden;"><img src="http://nurl"></div>'
     };
 
+    it('should get incorrect bid response if response body is missing', function (){
+      let response = makeResponse();
+      delete response.body;
+      let result = spec.interpretResponse(response, request);
+      expect(result.length).to.equal(0);
+    });
+
+    it('should get incorrect bid response if id or seat id of response body is missing', function (){
+      let response1 = makeResponse();
+      delete response1.body.id;
+      let result1 = spec.interpretResponse(response1, request);
+      expect(result1.length).to.equal(0);
+
+      let response2 = makeResponse();
+      delete response2.body.seatbid;
+      let result2 = spec.interpretResponse(response2, request);
+      expect(result2.length).to.equal(0);
+    });
+
     it('should get the correct bid response', function () {
       let result = spec.interpretResponse(makeResponse(), request);
       expect(result.length).to.equal(1);
@@ -241,4 +297,69 @@ describe('deltaprojectsBidAdapter', function() {
       expect(result[0]).to.deep.equal(expectedResult);
     });
   });
+
+  describe('onBidWon', function (){
+    const OPEN_RTB_RESP = {
+      body: {
+        id: 'abc',
+        seatbid: [
+          {
+            bid: [
+              {
+                'id': 'abc*123*456',
+                'impid': 'xxxxxxx',
+                'price': 46.657196,
+                'adm': '<iframe id="dsp_iframe_228285197" src="https//abc/${AUCTION_PRICE:B64}&creative_id=123"></script>',
+                'adomain': ['deltaprojects.com'],
+                'h': 600,
+                'w': 300,
+                'cid': '868253',
+                'crid': '732935',
+                'cat': [],
+              },
+            ], 'seat': '2147483647',
+          },
+        ],
+        bidid: 'xyz',
+        cur: 'USD',
+      },
+    }
+    it('should replace auction price macro', () => {
+      const bid = spec.interpretResponse(OPEN_RTB_RESP)[0];
+      spec.onBidWon(bid);
+      expect(bid.ad).to.contains(`${Math.round(bid.cpm * 1000000)}`);
+    });
+  })
+
+  describe('getUserSyncs', function (){
+
+    it('should not do user sync when pixel is disabled', () => {
+      const syncOptions = { pixelEnabled: false }
+      const result = spec.getUserSyncs(syncOptions)
+      expect(result.length).to.equal(0);
+    });
+
+    it('should do user sync without gdpr params when gdprConsent missing', () => {
+      const syncOptions = { pixelEnabled: true }
+      const gdprConsent = undefined
+      const result = spec.getUserSyncs(syncOptions, gdprConsent)
+      expect(result[0].url).to.equal(USERSYNC_URL);
+    });
+
+    it('should do user sync with gdpr params when gdprConsent exists', () => {
+      const syncOptions = { pixelEnabled: true }
+      const gdprConsent = {
+        gdprApplies: true,
+        consentString: 'ABCABCABC'
+      }
+      const expectedResult1 = USERSYNC_URL + `?gdpr=${Number(gdprConsent.gdprApplies)}&gdpr_consent=${gdprConsent.consentString}`
+      const result1 = spec.getUserSyncs(syncOptions, {}, gdprConsent)
+      expect(result1[0].url).to.equal(expectedResult1);
+
+      delete gdprConsent.gdprApplies
+      const result2 = spec.getUserSyncs(syncOptions, {}, gdprConsent)
+      const expectedResult2 = USERSYNC_URL + `?gdpr_consent=${gdprConsent.consentString}`
+      expect(result2[0].url).to.equal(expectedResult2);
+    });
+  })
 });
